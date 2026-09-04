@@ -143,6 +143,7 @@ def _seed_accounts():
             full_name="Demo Patient",
             role="patient",
             preferred_language="en",
+            is_active_account=True,
         )
         user.set_password("patient123")
         db.session.add(user)
