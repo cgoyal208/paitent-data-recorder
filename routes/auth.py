@@ -130,6 +130,8 @@ def register():
                     dob_val = dt.strptime(dob, "%Y-%m-%d").date()
                 except ValueError:
                     dob_val = None
+            # Get a doctor/admin user to set as creator, or use the first admin
+            creator = User.query.filter_by(role="doctor").first() or User.query.filter_by(role="admin").first()
             patient = Patient(
                 patient_id=generate_patient_id(),
                 full_name=full_name,
@@ -144,7 +146,7 @@ def register():
                 abha_id=abha_id or None,
                 aadhaar_demo=aadhaar_demo or None,
                 user_id=user.id,
-                created_by_id=user.id,
+                created_by_id=creator.id if creator else user.id,
             )
             db.session.add(patient)
             write_audit("register_patient", "user", user.id, patient_id=None)

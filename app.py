@@ -170,4 +170,5 @@ def _seed_accounts():
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Allow access from all network interfaces, not just localhost
+    app.run(host="0.0.0.0", port=5000, debug=True)
