@@ -13,6 +13,7 @@ from models.medical_history import MedicalHistory  # noqa: F401
 from models.patient import Patient
 from models.privacy import AuditLog, Consent, RedFlagAlert  # noqa: F401
 from models.records import DocumentExtraction, LabResult, MedicalDocument, Medication, TimelineEvent  # noqa: F401
+from models.settings import SystemSetting  # noqa: F401
 from models.user import User
 from utils.helpers import generate_patient_id
 
@@ -118,6 +119,7 @@ def create_app():
             from database.migrate import upgrade_schema
 
             upgrade_schema()
+            _ensure_system_settings()
             _seed_accounts()
         except OperationalError as exc:
             print("\nCould not connect to the configured database.")
@@ -125,6 +127,14 @@ def create_app():
             print(f"Details: {exc}\n")
 
     return app
+
+
+def _ensure_system_settings():
+    defaults = {"patient_id_policy": "retain"}
+    for key, value in defaults.items():
+        if not SystemSetting.query.filter_by(key=key).first():
+            db.session.add(SystemSetting(key=key, value=value))
+    db.session.commit()
 
 
 def _seed_accounts():

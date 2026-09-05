@@ -8,12 +8,48 @@ from models.privacy import AuditLog
 from models.clinical import ClinicalSession
 from models.patient import Patient
 from models.medical_case import MedicalCase
+from models.settings import SystemSetting
 from extensions import db
+
+
+def get_patient_id_policy():
+    setting = SystemSetting.query.filter_by(key="patient_id_policy").first()
+    if setting and setting.value in {"retain", "allow_reuse"}:
+        return setting.value
+    return "retain"
+
+
+def set_patient_id_policy(policy):
+    valid = {"retain", "allow_reuse"}
+    value = (policy or "retain").strip()
+    if value not in valid:
+        value = "retain"
+    setting = SystemSetting.query.filter_by(key="patient_id_policy").first()
+    if not setting:
+        setting = SystemSetting(key="patient_id_policy", value=value)
+        db.session.add(setting)
+    else:
+        setting.value = value
+    db.session.commit()
+    return value
 
 
 def generate_patient_id():
     today = datetime.utcnow().strftime("%Y%m%d")
     prefix = f"PAT-{today}-"
+    policy = get_patient_id_policy()
+
+    if policy == "allow_reuse":
+        existing = {
+            int(record.patient_id.split("-")[-1])
+            for record in Patient.query.filter(Patient.patient_id.like(f"{prefix}%")).all()
+            if record.patient_id.split("-")[-1].isdigit()
+        }
+        for candidate in range(1, 10000):
+            if candidate not in existing:
+                return f"{prefix}{candidate:04d}"
+        return f"{prefix}{len(existing) + 1:04d}"
+
     last = (
         Patient.query.filter(Patient.patient_id.like(f"{prefix}%"))
         .order_by(Patient.id.desc())

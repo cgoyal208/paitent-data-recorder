@@ -16,6 +16,7 @@ from models.records import (
     TimelineEvent,
 )
 from models.privacy import AuditLog, Consent, RedFlagAlert
+from models.settings import SystemSetting
 
 __all__ = [
     "User",
@@ -34,4 +35,5 @@ __all__ = [
     "Consent",
     "RedFlagAlert",
     "AuditLog",
+    "SystemSetting",
 ]

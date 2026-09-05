@@ -16,6 +16,23 @@
 </div>
 <div class="card panel mb-4">
     <div class="card-body">
+        <h2 class="h5">Patient ID policy</h2>
+        <form method="post" action="{{ url_for('admin.update_patient_id_policy') }}" class="row g-3 align-items-end">
+            <div class="col-md-6">
+                <label class="form-label" for="patient_id_policy">Patient ID handling</label>
+                <select class="form-select" id="patient_id_policy" name="patient_id_policy">
+                    <option value="retain" {% if patient_id_policy == 'retain' %}selected{% endif %}>Retain unique sequential IDs</option>
+                    <option value="allow_reuse" {% if patient_id_policy == 'allow_reuse' %}selected{% endif %}>Allow reuse of free IDs</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-primary" type="submit">Save policy</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="card panel mb-4">
+    <div class="card-body">
         <h2 class="h5">Users</h2>
         <div class="table-responsive">
             <table class="table">
