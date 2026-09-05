@@ -11,7 +11,5 @@ services:
         value: change-this-secret-key-in-production
       - key: DATABASE_URL
         value: sqlite:///patient_case.db
-      - key: PORT
-        value: "5000"
       - key: FLASK_ENV
         value: production
