@@ -1,6 +1,7 @@
+import io
 import os
 
-from flask import Flask, render_template
+from flask import Flask, render_template, send_file
 from flask_login import current_user
 from sqlalchemy.exc import OperationalError
 
@@ -70,6 +71,22 @@ def create_app():
                 message="This area is limited to another role. Sign in with the correct account.",
             ),
             403,
+        )
+
+    @app.route("/favicon.ico")
+    def favicon():
+        svg = """
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+          <rect width="64" height="64" rx="14" fill="#0d6efd"/>
+          <path d="M20 42V22h8.5c6.1 0 9.7 2.8 9.7 8.5S34.6 39 28.5 39H20zm8.5-11.2h1.5c2.8 0 4.1-1.1 4.1-3.3s-1.3-3.1-4.1-3.1h-1.5v6.4z" fill="#fff"/>
+          <path d="M44 42V22h4v20h-4zm-18.5 0 6.5-20h4.6l-6.5 20h-4.6z" fill="#dfeeff"/>
+        </svg>
+        """.strip()
+        return send_file(
+            io.BytesIO(svg.encode("utf-8")),
+            mimetype="image/svg+xml",
+            as_attachment=False,
+            download_name="favicon.svg",
         )
 
     @app.errorhandler(404)

@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: medikiosk
+    env: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: SECRET_KEY
+        value: change-this-secret-key-in-production
+      - key: DATABASE_URL
+        value: sqlite:///patient_case.db
+      - key: FLASK_ENV
+        value: production
