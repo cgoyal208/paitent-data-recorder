@@ -43,6 +43,11 @@ def _add_columns(table_name, columns):
 
 def upgrade_schema():
     db.create_all()
+    inspector = inspect(db.engine)
+    if "system_settings" not in inspector.get_table_names():
+        from models.settings import SystemSetting
+
+        SystemSetting.__table__.create(bind=db.engine, checkfirst=True)
     _add_columns("users", USER_COLUMNS)
     _add_columns("patients", PATIENT_COLUMNS)
 

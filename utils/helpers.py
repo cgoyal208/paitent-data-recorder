@@ -13,9 +13,12 @@ from extensions import db
 
 
 def get_patient_id_policy():
-    setting = SystemSetting.query.filter_by(key="patient_id_policy").first()
-    if setting and setting.value in {"retain", "allow_reuse"}:
-        return setting.value
+    try:
+        setting = SystemSetting.query.filter_by(key="patient_id_policy").first()
+        if setting and setting.value in {"retain", "allow_reuse"}:
+            return setting.value
+    except Exception:
+        return "retain"
     return "retain"
 
 
@@ -24,13 +27,16 @@ def set_patient_id_policy(policy):
     value = (policy or "retain").strip()
     if value not in valid:
         value = "retain"
-    setting = SystemSetting.query.filter_by(key="patient_id_policy").first()
-    if not setting:
-        setting = SystemSetting(key="patient_id_policy", value=value)
-        db.session.add(setting)
-    else:
-        setting.value = value
-    db.session.commit()
+    try:
+        setting = SystemSetting.query.filter_by(key="patient_id_policy").first()
+        if not setting:
+            setting = SystemSetting(key="patient_id_policy", value=value)
+            db.session.add(setting)
+        else:
+            setting.value = value
+        db.session.commit()
+    except Exception:
+        return "retain"
     return value
 
 
